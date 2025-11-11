@@ -1,1625 +1,356 @@
 <!DOCTYPE html>
-<html lang="es-CL">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cartera Cliente: revisión y propuesta V_octubre2025</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
-    
+    <title>Resumen Extendido | Comité de Estrategia BCI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* --- Estilos Generales y Paleta BCI --- */
-        :root {
-            --bci-azul-oscuro: #002D5A;
-            --bci-azul-medio: #005FFF;
-            --bci-gris-claro: #f4f8ff;
-            --bci-gris-borde: #daddf0;
-            --color-sell: #D00000;
-            --color-buy: #018749;
-            --color-new-buy: #005FFF;
-        }
-
         body {
-            font-family: Arial, Helvetica, sans-serif;
-            margin: 0 auto;
-            padding: 10px 20px;
-            max-width: 1200px;
-            background-color: #f9f9f9;
-            color: #333;
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f9;
         }
-
-        h1, h2, h3, h4 {
-            color: var(--bci-azul-oscuro);
-            margin-top: 1.5em;
+        .section-header {
+            border-left: 5px solid #00569e; /* Color corporativo BCI (azul) */
+            padding-left: 1rem;
         }
-
-        h1 {
-            text-align: center;
-            border-bottom: 4px solid var(--bci-azul-medio);
-            padding-bottom: 10px;
+        .key-point-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-
-        h2 {
-            border-bottom: 2px solid var(--bci-azul-medio);
-            padding-bottom: 5px;
-            margin-top: 2em;
+        .key-point-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
         }
-
-        h3 {
-            border-bottom: 1px solid var(--bci-gris-borde);
-            padding-bottom: 3px;
+        .conclusion-box {
+            background-color: #e0f2fe; /* Azul muy claro para las conclusiones */
+            border: 1px solid #00569e;
+            border-radius: 0.75rem;
         }
-
-        /* --- Estilos de Tablas --- */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            font-size: 0.95em;
+        .data-positive {
+            color: #16a34a; /* Verde */
         }
-
-        th, td {
-            border: 1px solid var(--bci-gris-borde);
-            padding: 10px 12px;
-            text-align: left;
-            vertical-align: middle;
-        }
-
-        th {
-            background-color: var(--bci-azul-oscuro);
-            color: white;
-            font-weight: bold;
-        }
-
-        tbody tr:nth-child(odd) {
-            background-color: #fff;
-        }
-        
-        tbody tr:nth-child(even) {
-            background-color: var(--bci-gris-claro);
-        }
-        
-        tfoot tr {
-            background-color: #e9ecef;
-            font-weight: bold;
-        }
-
-        td.text-right, th.text-right { text-align: right; }
-        td.text-center, th.text-center { text-align: center; }
-
-        /* Clases de color para ajustes */
-        .sell { color: var(--color-sell); font-weight: bold; }
-        .buy { color: var(--color-buy); font-weight: bold; }
-        .new-buy { color: var(--bci-azul-medio); font-weight: bold; }
-        .portfolio-row,
-        tr.portfolio-row:nth-child(odd),
-        tr.portfolio-row:nth-child(even) {
-            background-color: #e6eefc;
-            font-weight: bold;
-        }
-        .portfolio-detail-row,
-        tr.portfolio-detail-row:nth-child(odd),
-        tr.portfolio-detail-row:nth-child(even) {
-            background-color: #f4f8ff;
-            font-size: 0.9em;
-        }
-        .portfolio-detail-row td {
-            padding-left: 30px;
-        }
-        .caja-row,
-        tr.caja-row:nth-child(odd),
-        tr.caja-row:nth-child(even) {
-            background-color: #fef8e0;
-            font-style: italic;
-        }
-
-
-        /* --- Estilos de Controles e Inputs --- */
-        input[type="number"] {
-            width: 120px;
-            padding: 8px;
-            border: 1px solid var(--bci-gris-borde);
-            border-radius: 4px;
-            text-align: right;
-            font-size: 1em;
-            margin-right: 5px;
-        }
-        
-        #tabla-ponderacion-acciones input[type="number"] {
-            width: 80px;
-            padding: 5px;
-            font-size: 0.95em;
-        }
-
-        input[type="radio"], input[type="checkbox"] {
-            margin-right: 5px;
-            transform: scale(1.1);
-            vertical-align: middle;
-        }
-
-        .decision-label {
-            margin-right: 15px;
-            cursor: pointer;
-        }
-        
-        .monto-parcial-input {
-            width: 100px;
-            margin-left: 5px;
-        }
-
-        #capital-total-container {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: var(--bci-gris-claro);
-            border: 1px solid var(--bci-gris-borde);
-            border-radius: 5px;
-            font-size: 1.2em;
-            text-align: right;
-        }
-        
-        #capital-liberado-monto {
-            color: var(--color-buy);
-            font-weight: bold;
-        }
-
-        #capital-warning {
-            color: var(--color-sell);
-            font-weight: bold;
-            text-align: right;
-            margin-top: 10px;
-            font-size: 0.9em;
-        }
-        
-        #modelo-toggle-container {
-            margin-top: 15px;
-            padding: 12px;
-            background-color: #fff;
-            border: 1px solid var(--bci-gris-borde);
-            border-radius: 5px 5px 0 0;
-            font-size: 1.05em;
-            border-bottom: none;
-        }
-        #modelo-toggle-container label {
-            font-weight: bold;
-            color: var(--bci-azul-oscuro);
-            cursor: pointer;
-        }
-        #capital-para-acciones-monto {
-            color: var(--color-buy);
-            font-weight: bold;
-        }
-        
-        #ponderacion-acciones-container {
-            margin-top: 0;
-            border: 1px solid var(--bci-gris-borde);
-            border-radius: 0 0 5px 5px;
-            padding: 15px;
-            background-color: #fff;
-        }
-        #total-ponderacion-pct.invalid {
-            color: var(--color-sell);
-            font-weight: bold;
-        }
-        
-        /* --- Sección 1.5: Selección de Estrategia --- */
-        #strategy-selector {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-        .strategy-button {
-            padding: 12px 20px;
-            font-size: 1em;
-            font-weight: bold;
-            border: 2px solid var(--bci-gris-borde);
-            background-color: #fff;
-            color: var(--bci-azul-medio);
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .strategy-button:hover {
-            background-color: var(--bci-gris-claro);
-            border-color: var(--bci-azul-medio);
-        }
-        .strategy-button.active {
-            background-color: var(--bci-azul-oscuro);
-            color: white;
-            border-color: var(--bci-azul-oscuro);
-        }
-
-        /* --- Sección 2: Análisis de Activos Clave --- */
-        #analisis-dinamico-container .analysis-container {
-            margin-top: 15px;
-            border: 1px solid var(--bci-gris-borde);
-            border-radius: 5px;
-            background-color: #fff;
-            padding: 20px;
-        }
-        .analysis-box {
-            display: flex;
-            gap: 20px;
-            margin-top: 15px;
-        }
-        .analysis-justificacion {
-            flex: 2;
-            font-size: 0.95em;
-            line-height: 1.5;
-        }
-        .analysis-drivers {
-            flex: 1;
-        }
-        .drivers-box {
-            padding: 15px;
-            border-radius: 5px;
-            font-size: 0.9em;
-        }
-        .drivers-box h5 {
-            margin-top: 0;
-            padding-bottom: 5px;
-            font-size: 1.1em;
-        }
-        .drivers-box ul {
-            padding-left: 20px;
-            margin-bottom: 0;
-        }
-        .drivers-positivo {
-            background-color: #e6f4e9;
-            border: 1px solid #c3e6cb;
-        }
-        .drivers-positivo h5 { color: #155724; border-bottom: 1px solid #b1dfbb; }
-        .drivers-negativo {
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            margin-top: 10px;
-        }
-        .drivers-negativo h5 { color: #721c24; border-bottom: 1px solid #f1b0b7; }
-        .analysis-table {
-            width: 100%;
-            margin-bottom: 15px;
-        }
-        cite {
-            font-size: 0.8em;
-            color: #777;
-            font-style: italic;
-        }
-
-        /* --- Sección 3: Portafolios --- */
-        #adp-info-display {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #fff;
-            border: 1px dashed var(--bci-gris-borde);
-            border-radius: 5px;
-            font-size: 0.9em;
-            min-height: 50px;
-        }
-        #adp-info-display p { margin: 5px 0 0 0; }
-        #adp-info-display strong { color: var(--bci-azul-oscuro); }
-
-        /* --- Sección 5: Resumen Ejecutivo --- */
-        #resumen-ejecutivo {
-            background-color: #fff;
-            border: 1px solid #ccc;
-            padding: 30px;
-            margin-top: 20px;
-        }
-        #print-button {
-            float: right;
-            padding: 10px 15px;
-            background-color: var(--bci-azul-medio);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-        }
-        #print-button:hover {
-            background-color: var(--bci-azul-oscuro);
-        }
-        .origen-destino-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .origen-destino-col {
-            flex: 1;
-            padding: 15px;
-            border: 1px solid var(--bci-gris-borde);
-            border-radius: 5px;
-            background-color: var(--bci-gris-claro);
-        }
-        .origen-destino-col h4 {
-            margin-top: 0;
-            padding-bottom: 5px;
-            border-bottom: 1px solid var(--bci-gris-borde);
-        }
-        .origen-destino-col ul {
-            padding-left: 20px;
-            margin: 0;
-        }
-        .origen-destino-col li {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.95em;
-            margin-bottom: 5px;
-        }
-        .origen-destino-col .total {
-            font-weight: bold;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #ccc;
-        }
-
-        .charts-container {
-            display: flex;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .chart-box {
-            flex: 1;
-            position: relative;
-            height: 350px; /* Ajustar altura para gráficos */
-        }
-        #ejecutivo-tabla-final {
-            margin-top: 25px;
-        }
-
-        /* --- Estilos de Impresión --- */
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #resumen-ejecutivo, #resumen-ejecutivo * {
-                visibility: visible;
-            }
-            #resumen-ejecutivo {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                margin: 0;
-                padding: 0;
-                border: none;
-                box-shadow: none;
-            }
-            #print-button {
-                visibility: hidden;
-            }
-            .charts-container {
-                page-break-inside: avoid;
-            }
-            table {
-                page-break-inside: auto;
-            }
-            tr {
-                page-break-inside: avoid;
-                page-break-after: auto;
-            }
+        .data-negative {
+            color: #dc2626; /* Rojo */
         }
     </style>
 </head>
-<body>
+<body class="p-4 md:p-8">
 
-    <h1>Simulador de Rebalanceo de Cartera</h1>
-    <p><strong>Asesor:</strong> Cartera Cliente: revisión y propuesta V_octubre2025 (Equipo Estrategia BCI)</p>
-    <p>Esta herramienta le permite simular el rebalanceo de su cartera. Puede decidir vender sus activos actuales, aportar nuevo capital, e invertir en portafolios recomendados o en una nueva mezcla de acciones individuales.</p>
+    <div class="max-w-5xl mx-auto">
+        <!-- Título Principal -->
+        <header class="mb-8 p-6 bg-white rounded-xl shadow-lg">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-1">
+                Análisis Extendido Comité de Estrategia
+            </h1>
+            <p class="text-xl text-gray-600">
+                Bci Estrategia y Estudios | 10 de noviembre, 2025
+            </p>
+        </header>
 
-    <h2>1. Simulador de Rebalanceo y Aporte de Capital</h2>
-    <p>Revise su cartera actual y decida qué activos desea vender (total o parcialmente). Luego, ingrese el monto de capital nuevo que desea aportar.</p>
-    
-    <table id="tabla-desinversion">
-        <thead>
-            <tr>
-                <th>Sector</th>
-                <th>Activo Actual</th>
-                <th class="text-right">Monto Actual (CLP)</th>
-                <th class="text-center" style="width: 45%;">Decisión de Venta</th>
-                <th class="text-right">Monto a Liberar (CLP)</th>
-            </tr>
-        </thead>
-        <tbody>
-            </tbody>
-    </table>
+        <!-- Sección I: Mercados Globales y Resultados Corporativos (EE.UU.) -->
+        <section class="mb-10">
+            <h2 class="section-header text-2xl font-bold text-gray-800 mb-6">
+                I. Mercados Globales y Resultados Corporativos (EE.UU.)
+            </h2>
 
-    <div id="capital-total-container">
-        <div style="display: flex; justify-content: flex-end; align-items: center; gap: 20px;">
-            <label for="aporte-capital-nuevo"><strong>Aporte de Capital Nuevo (CLP):</strong></label>
-            <input type="number" id="aporte-capital-nuevo" value="0" min="0" step="1000000">
-        </div>
-        <hr style="border: 0; border-top: 1px solid var(--bci-gris-borde); margin: 15px 0;">
-        <div style="font-size: 1.3em;">
-            <strong>Capital Total Disponible para Invertir: <span id="capital-liberado-monto">$0</span></strong>
-        </div>
-    </div>
-
-    <h2>1.5. Selección de Estrategia de Acciones</h2>
-    <p>Por favor, seleccione el perfil de estrategia para la inversión en acciones individuales. Esto definirá el análisis de la Sección 2 y el destino del capital restante.</p>
-    <div id="strategy-selector">
-        </div>
-
-
-    <h2>2. Análisis de Activos Clave</h2>
-    <div id="analisis-dinamico-container">
-        </div>
-
-
-    <h2>3. Incorporar Portafolios Accionarios Bci</h2>
-    <p>Seleccione los portafolios administrados en los que desea invertir e ingrese el monto en CLP para cada uno. El monto total no puede superar su capital disponible.</p>
-
-    <table id="tabla-portafolios">
-        <thead>
-            <tr>
-                <th style="width: 5%;">Selec.</th>
-                <th>Portafolio Administrado</th>
-                <th>Perfil de Riesgo</th>
-                <th class="text-right">YTD</th>
-                <th class="text-right" style="width: 25%;">Monto a Invertir (CLP)</th>
-            </tr>
-        </thead>
-        <tbody>
-            </tbody>
-    </table>
-    <div id="capital-warning" style="display: none;">
-        (!) El monto asignado a portafolios supera el capital disponible. Se ha ajustado al máximo.
-    </div>
-
-    <div id="modelo-toggle-container">
-        <label>
-            <input type="checkbox" id="toggle-modelo-acciones" checked> 
-            Invertir capital restante (<span id="capital-para-acciones-monto">$0</span>) en el Modelo de Acciones Recomendado.
-        </label>
-        <p style="font-size: 0.8em; margin: 5px 0 0 25px; font-weight: normal; color: #333;">
-            (Si desmarca esta casilla, el capital restante quedará como "Caja (No Asignado)")
-        </p>
-    </div>
-    
-    <div id="ponderacion-acciones-container" style="display: none;">
-        <h4 style="margin-top:0;">Personalizar Ponderación del Modelo</h4>
-        <p style="font-size: 0.9em; margin-top: -10px;">Ajuste los pesos (%) de las acciones recomendadas. El total debe sumar 100%.</p>
-        <table id="tabla-ponderacion-acciones">
-            <thead>
-                <tr>
-                    <th>Activo</th>
-                    <th>Categoría/Sector</th>
-                    <th class="text-right">Ponderación (%)</th>
-                </tr>
-            </thead>
-            <tbody>
-                </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="2" class="text-right"><strong>Total Ponderado</strong></td>
-                    <td class="text-right"><strong id="total-ponderacion-pct">100,0%</strong></td>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
-    
-    <div id="adp-info-display">
-        <p>Seleccione un portafolio para ver su descripción y composición principal.</p>
-    </div>
-
-    <h2>4. Propuesta de Rebalanceo a Ejecutar</h2>
-    <p>Este es el detalle de las operaciones de venta, mantención y compra que se ejecutarían según sus decisiones.</p>
-
-    <h3>Rebalanceo de Acciones Individuales</h3>
-    <table id="tabla-final-acciones">
-        <thead>
-            <tr>
-                <th>Categoría/Sector</th>
-                <th>Activo</th>
-                <th class="text-right">Monto Actual (CLP)</th>
-                <th class="text-right">Ajuste (CLP)</th>
-                <th class="text-right">Ajuste (%)</th>
-                <th class="text-right">Monto Objetivo (CLP)</th>
-            </tr>
-        </thead>
-        <tbody>
-            </tbody>
-    </table>
-
-    <h3>Inversión en Portafolios Accionarios Bci</h3>
-    <table id="tabla-final-adp">
-        <thead>
-            <tr>
-                <th>Categoría/Sector</th>
-                <th>Activo/Portafolio</th>
-                <th class="text-right">Monto Actual (CLP)</th>
-                <th class="text-right">Ajuste (CLP)</th>
-                <th class="text-right">Ajuste (%)</th>
-                <th class="text-right">Monto Objetivo (CLP)</th>
-            </tr>
-        </thead>
-        <tbody>
-            </tbody>
-    </table>
-
-
-    <div id="resumen-ejecutivo">
-        <h2>5. Resumen Ejecutivo de la Propuesta Final</h2>
-        <button id="print-button" onclick="window.print()">🖨️ Imprimir Resumen</button>
-
-        <h3>Visión de Mercado y Objetivo</h3>
-        <p>
-            Nuestro escenario base contempla para 2026 un crecimiento del PIB de 2,1%, una inflación controlada en torno al 3,0% y una Tasa de Política Monetaria estabilizándose en 4,0%. Este ambiente de normalización, junto a un precio del cobre resiliente ($4,3 USD/lb) y un tipo de cambio en $910, debería impulsar los resultados corporativos.
-            <br>
-            Proyectamos que el **IPSA alcanzaría en torno a 10.250 puntos durante 2026**. El objetivo de esta propuesta es alinear su cartera a esta visión, capturando oportunidades en sectores con mayor retorno esperado y gestionando el riesgo mediante la diversificación en portafolios administrados y acciones seleccionadas por su perfil táctico y fundamental.
-        </p>
-
-        <h3>Origen y Destino de Fondos</h3>
-        <div class="origen-destino-container">
-            <div class="origen-destino-col">
-                <h4>Origen de Fondos (CLP)</h4>
-                <ul id="origen-fondos">
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Puntos Clave: Panorama Global</h3>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Card: S&P 500 Performance -->
+                <div class="key-point-card p-5">
+                    <p class="font-bold text-lg text-gray-900 mb-2">1. Desempeño S&P 500</p>
+                    <ul class="list-disc pl-5 text-gray-600 space-y-1 text-sm">
+                        <li>Retorno YTD: <span class="font-semibold data-positive">+14.4%</span> (USD)</li>
+                        <li>Retorno 7 Días: <span class="font-semibold data-negative">-1.80%</span></li>
+                        <li>Presión por caída de **Mag-7**.</li>
+                        <li>Sectores 7D más afectados: **Tecnología (-2.80%)** y **Growth (-2.59%)**.</li>
                     </ul>
-            </div>
-            <div class="origen-destino-col">
-                <h4>Destino de Fondos (CLP)</h4>
-                <ul id="destino-fondos">
+                </div>
+
+                <!-- Card: Rendimiento Regional YTD -->
+                <div class="key-point-card p-5">
+                    <p class="font-bold text-lg text-gray-900 mb-2">2. Rendimiento Regional YTD (en USD)</p>
+                    <ul class="list-disc pl-5 text-gray-600 space-y-1 text-sm">
+                        <li>**Chile (IPSA):** <span class="font-semibold data-positive">+52.3%</span></li>
+                        <li>**Brasil (Bovespa):** <span class="font-semibold data-positive">+50.3%</span></li>
+                        <li>**México (Mexbol):** <span class="font-semibold data-positive">+44.5%</span></li>
+                        <li>**Alemania (DAX):** <span class="font-semibold data-positive">+34.1%</span></li>
+                        <li>**NASDAQ:** <span class="font-semibold data-positive">+19.1%</span></li>
                     </ul>
-            </div>
-        </div>
+                </div>
 
-        <h3>Composición de Cartera</h3>
-        <div class="charts-container">
-            <div class="chart-box">
-                <h4>Cartera Actual</h4>
-                <canvas id="grafico-actual"></canvas>
-            </div>
-            <div class="chart-box">
-                <h4>Cartera Objetivo Total</h4>
-                <canvas id="grafico-objetivo"></canvas>
-            </div>
-        </div>
+                <!-- Card: US Shutdown -->
+                <div class="key-point-card p-5">
+                    <p class="font-bold text-lg text-yellow-700 mb-2">3. Riesgo Político: US Shutdown</p>
+                    <ul class="list-disc pl-5 text-gray-600 space-y-1 text-sm">
+                        <li>*Shutdown* de 2025 inició el 1 de octubre (en curso, 40 días).</li>
+                        <li>El más largo fue en 2018-19 (Trump, 34 días).</li>
+                        <li>Impacto estimado 2018-19: Pérdida permanente de **\$3 mil millones** en PIB.</li>
+                    </ul>
+                </div>
 
-        <h3>Detalle Cartera Objetivo</h3>
-        <table id="ejecutivo-tabla-final">
-            <thead>
-                <tr>
-                    <th>Categoría/Sector</th>
-                    <th>Activo/Portafolio</th>
-                    <th class="text-right">Monto Objetivo (CLP)</th>
-                    <th class="text-right">% Cartera</th>
-                </tr>
-            </thead>
-            <tbody>
-                </tbody>
-            <tfoot>
-                </tfoot>
-        </table>
+                <!-- Card: Q3 Sólido -->
+                <div class="key-point-card p-5">
+                    <p class="font-bold text-lg text-green-700 mb-2">4. Temporada de Resultados Sólida</p>
+                    <ul class="list-disc pl-5 text-gray-600 space-y-1 text-sm">
+                        <li>**82% de empresas** superó estimaciones de EPS (máximo desde Q3 2021).</li>
+                        <li>Supera promedio 5 años (78%) y 10 años (75%).</li>
+                        <li>Destacan **Health Care** y **Consumer Staples** (92% de *beats*).</li>
+                    </ul>
+                </div>
+
+                <!-- Card: Crecimiento Sectorial -->
+                <div class="key-point-card p-5">
+                    <p class="font-bold text-lg text-gray-900 mb-2">5. Crecimiento Sectorial Amplio</p>
+                    <ul class="list-disc pl-5 text-gray-600 space-y-1 text-sm">
+                        <li>**Crecimiento EPS S&P 500: +11.8%** interanual.</li>
+                        <li>**Crecimiento Ingresos: +8.2%** interanual.</li>
+                        <li>Líderes EPS: **Tecnología (+24.1%)** y **Financiero (+23.9%)**.</li>
+                        <li>**Todos los 11 sectores** reportan crecimiento en ingresos.</li>
+                    </ul>
+                </div>
+
+                <!-- Card: Valoración Cara -->
+                <div class="key-point-card p-5">
+                    <p class="font-bold text-lg text-red-600 mb-2">6. Valoración con Premio (Caro)</p>
+                    <ul class="list-disc pl-5 text-gray-600 space-y-1 text-sm">
+                        <li>Ratio P/E S&P 500: **25.3x**.</li>
+                        <li>Premio de **+18.8%** sobre promedio histórico.</li>
+                        <li>Claramente **sobre una desviación estándar** (vulnerable a *shocks*).</li>
+                        <li>Sectores 'Growth' y 'Technology' son los más caros.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Conclusión I -->
+            <div class="conclusion-box mt-8 p-6">
+                <p class="font-bold text-lg text-[#00569e] mb-2">Conclusión Clave: Tesis Central (EE.UU.)</p>
+                <p class="text-gray-800 leading-relaxed">
+                    Los fundamentos corporativos de EE.UU. son robustos, con un crecimiento de EPS superior al 11% y una expansión de ingresos en todos los sectores. Sin embargo, esta solidez convive con una **valoración históricamente estirada** (P/E 25,3x) que exige una justificación constante a través de sorpresas positivas. El mercado, valorado sobre una desviación estándar de su promedio, es **vulnerable a correcciones** ante cualquier decepción o riesgo (como el *shutdown*). Se requiere que las ganancias sigan superando las expectativas para sostener los múltiplos actuales en un entorno de tasas más elevadas.
+                </p>
+            </div>
+        </section>
+
+        <!-- Sección II: Renta Variable Nacional (SQM-Codelco y IPSA) -->
+        <section class="mb-10">
+            <h2 class="section-header text-2xl font-bold text-gray-800 mb-6">
+                II. Renta Variable Nacional (SQM-Codelco y IPSA)
+            </h2>
+
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Puntos Clave: Alianza SQM-Codelco e IPSA</h3>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Card: Regulación China -->
+                <div class="key-point-card p-5">
+                    <p class="font-bold text-lg text-yellow-700 mb-2">1. Fin de Incertidumbre Regulatoria</p>
+                    <ul class="list-disc pl-5 text-gray-600 space-y-1 text-sm">
+                        <li>Aprobación de la **SAMR (Autoridad Antimonopolio de China)**.</li>
+                        <li>Era el último hito regulatorio pendiente.</li>
+                        <li>China interviene por ser el epicentro de la cadena de valor del litio.</li>
+                    </ul>
+                </div>
+
+                <!-- Card: Condiciones -->
+                <div class="key-point-card p-5">
+                    <p class="font-bold text-lg text-gray-900 mb-2">2. Condiciones de SAMR (Remedios)</p>
+                    <ul class="list-disc pl-5 text-gray-600 space-y-1 text-sm">
+                        <li>Suministro a China en términos **FRAND** (justos, razonables).</li>
+                        <li>Precios topeados al **Benchmark Market Price** (no político).</li>
+                        <li>**Firewalls de información** y un **Monitoring Trustee** (Supervisor).</li>
+                    </ul>
+                </div>
+                
+                <!-- Card: Impacto -->
+                <div class="key-point-card p-5">
+                    <p class="font-bold text-lg text-green-700 mb-2">3. Impacto No Material en SQM</p>
+                    <ul class="list-disc pl-5 text-gray-600 space-y-1 text-sm">
+                        <li>SQM estima que resultados **no habrían variado sustancialmente**.</li>
+                        <li>**Continuidad operativa asegurada hasta 2060**.</li>
+                        <li>Control de SQM hasta 2030; Codelco desde 2031.</li>
+                    </ul>
+                </div>
+
+                <!-- Card: Momentum IPSA -->
+                <div class="key-point-card p-5">
+                    <p class="font-bold text-lg text-blue-700 mb-2">4. Momentum del IPSA</p>
+                    <ul class="list-disc pl-5 text-gray-600 space-y-1 text-sm">
+                        <li>Retorno YTD (USD): <span class="font-semibold data-positive">+52.35%</span> (Líder global).</li>
+                        <li>Retorno 30 Días (CLP): <span class="font-semibold data-positive">+11.67%</span>.</li>
+                        <li>Líderes 30D: **SALFACOR (+24.6%)**, **MALLPLAZ (+21.8%)**.</li>
+                        <li>Líderes 7D: **SALFACOR (+7.4%)**, **SQM/B (+5.6%)**.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Conclusión II -->
+            <div class="conclusion-box mt-8 p-6">
+                <p class="font-bold text-lg text-[#00569e] mb-2">Conclusión Clave: Punto de Inflexión para SQM e IPSA</p>
+                <p class="text-gray-800 leading-relaxed">
+                    La aprobación de China **disipa el riesgo existencial** sobre el Salar de Atacama post-2030, **desbloqueando el valor a largo plazo** de SQM (operación 2031-2060). La acción se transforma en una inversión de largo plazo, ya que las condiciones impuestas son manejables y no erosionan la rentabilidad. Esto, sumado al fuerte desempeño del sector financiero, ha impulsado al IPSA como el líder de retorno global en 2025.
+                </p>
+            </div>
+        </section>
+
+        <!-- Sección III: Renta Fija Local y Panorama Macroeconómico (Chile) -->
+        <section class="mb-10">
+            <h2 class="section-header text-2xl font-bold text-gray-800 mb-6">
+                III. Renta Fija Local y Panorama Macroeconómico (Chile)
+            </h2>
+
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Puntos Clave: Macro y TPM</h3>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Card: Inflación -->
+                <div class="key-point-card p-5">
+                    <p class="font-bold text-lg text-blue-700 mb-2">1. Convergencia de Inflación</p>
+                    <ul class="list-disc pl-5 text-gray-600 space-y-1 text-sm">
+                        <li>IPC Mensual: **0.0%**.</li>
+                        <li>IPC Anual: **3.4%** (cerca de la meta del 3%).</li>
+                        <li>IPC Sin Volátiles (Core): <span class="font-semibold data-positive">-0.1%</span> mensual (fuerte señal desinflacionaria).</li>
+                    </ul>
+                </div>
+
+                <!-- Card: TPM -->
+                <div class="key-point-card p-5">
+                    <p class="font-bold text-lg text-gray-900 mb-2">2. Expectativas de Recorte de Tasa</p>
+                    <ul class="list-disc pl-5 text-gray-600 space-y-1 text-sm">
+                        <li>TPM Actual: **4.75%**.</li>
+                        <li>Mercado asigna **84.1% de probabilidad** a un recorte de 25pb en Diciembre.</li>
+                        <li>TPM esperada Dic-25: **4.50%**.</li>
+                    </ul>
+                </div>
+
+                <!-- Card: Actividad -->
+                <div class="key-point-card p-5">
+                    <p class="font-bold text-lg text-gray-900 mb-2">3. Señales de Actividad Mixtas</p>
+                    <ul class="list-disc pl-5 text-gray-600 space-y-1 text-sm">
+                        <li>Ventas Retail (6.2%) e Imacec (3.2%) muestran mejora.</li>
+                        <li>Producción Industrial (1.5%) aún débil.</li>
+                        <li>Confianza Empresarial (45.5) sigue en zona pesimista.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Conclusión III -->
+            <div class="conclusion-box mt-8 p-6">
+                <p class="font-bold text-lg text-[#00569e] mb-2">Conclusión Clave: Política Monetaria en Transición</p>
+                <p class="text-gray-800 leading-relaxed">
+                    Chile está en una fase de **desinflación consolidada**, especialmente por la caída del IPC *core*. Esto obliga al Banco Central a continuar la flexibilización monetaria. El mercado descuenta con alta certeza un recorte de 25pb en diciembre. Este escenario es favorable para la valorización de la renta fija local y, a su vez, genera condiciones para un repunte del crecimiento en 2026.
+                </p>
+            </div>
+        </section>
+
+        <!-- Sección IV: Análisis Sectorial: Banca (Chile 9M25) -->
+        <section class="mb-10">
+            <h2 class="section-header text-2xl font-bold text-gray-800 mb-6">
+                IV. Análisis Sectorial: Banca (Chile 9M25)
+            </h2>
+            <p class="text-gray-700 mb-6 text-base">
+                El sector bancario chileno demuestra una sólida resiliencia y rentabilidad. Los estándares de aprobación de crédito comienzan a relajarse, señalando un cauto optimismo para el próximo ciclo de crédito.
+            </p>
+
+            <!-- Tabla Comparativa Banca -->
+            <div class="key-point-card overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Banco</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ROE</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Var. Utilidad a/a</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ratio Capital (Pat. Efec.)</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Foco Clave del Período</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Banco de Chile</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">21.7%</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">0.0% (Neutra)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">17.8%</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Crecimiento en comisiones y resultado financiero.</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Itaú Chile</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">10.1%</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm data-positive font-semibold">+16.4%</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">17.5%</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Fuerte expansión de utilidad por resultado financiero.</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Santander Chile</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">22.9%</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">-2.0% (Neutra)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">16.6%</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">El más rentable (ROE); Cobertura de mora sube a 105%.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Conclusión IV -->
+            <div class="conclusion-box mt-8 p-6">
+                <p class="font-bold text-lg text-[#00569e] mb-2">Conclusión Clave: Sector Bancario Sólido</p>
+                <p class="text-gray-800 leading-relaxed">
+                    El sistema bancario chileno está sólido, con altos niveles de capitalización (sobre 16.6%) y rentabilidad. **Santander lidera en ROE (22.9%)**, mientras **Itaú muestra el mayor crecimiento de utilidad (+16.4%)**. La gestión de riesgo es prudente, con indicadores de mora controlados y cobertura al alza, lo que da una base firme para la reactivación del crédito.
+                </p>
+            </div>
+        </section>
+
+        <!-- Sección V: Commodities y Tipo de Cambio (FX) -->
+        <section class="mb-10">
+            <h2 class="section-header text-2xl font-bold text-gray-800 mb-6">
+                V. Commodities y Tipo de Cambio (FX)
+            </h2>
+
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Puntos Clave: FX y Materias Primas</h3>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Card: Commodities 7D -->
+                <div class="key-point-card p-5">
+                    <p class="font-bold text-lg text-gray-900 mb-2">1. Commodities (Retorno 7 Días)</p>
+                    <ul class="list-disc pl-5 text-gray-600 space-y-1 text-sm">
+                        <li>Petróleo WTI: <span class="font-semibold data-positive">+6.68%</span></li>
+                        <li>Cobre: <span class="font-semibold data-positive">+2.50%</span></li>
+                        <li>Oro: <span class="font-semibold data-negative">-7.96%</span></li>
+                    </ul>
+                </div>
+
+                <!-- Card: Monedas YTD -->
+                <div class="key-point-card p-5">
+                    <p class="font-bold text-lg text-gray-900 mb-2">2. Monedas (Retorno YTD vs USD)</p>
+                    <ul class="list-disc pl-5 text-gray-600 space-y-1 text-sm">
+                        <li>Real Brasileño: <span class="font-semibold data-positive">+13.06%</span></li>
+                        <li>Euro: <span class="font-semibold data-positive">+12.39%</span></li>
+                        <li>Peso Mexicano: <span class="font-semibold data-positive">+11.69%</span></li>
+                        <li>Peso Chileno: <span class="font-semibold data-positive">+5.42%</span></li>
+                    </ul>
+                </div>
+                
+                <!-- Card: Modelo USDCLP -->
+                <div class="key-point-card p-5">
+                    <p class="font-bold text-lg text-blue-700 mb-2">3. Modelo Táctico USDCLP</Multipla>
+                    <ul class="list-disc pl-5 text-gray-600 space-y-1 text-sm">
+                        <li>Rango Táctico: **\$923 (Soporte)** - **\$946 (Resistencia)**.</li>
+                        <li>Señales recientes de **"Venta"** en el modelo.</li>
+                        <li>Sugiere un *peak* táctico y posible apreciación del peso a corto plazo.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Conclusión V -->
+            <div class="conclusion-box mt-8 p-6">
+                <p class="font-bold text-lg text-[#00569e] mb-2">Conclusión Clave: Commodities y Dólar</p>
+                <p class="text-gray-800 leading-relaxed">
+                    Mercado de commodities volátil, con un fuerte repunte del petróleo y el cobre en la última semana, mientras el oro retrocede. El peso chileno se ha apreciado moderadamente en el año, y el modelo táctico Bci sugiere que el dólar ha alcanzado un techo de corto plazo, con un rango operacional acotado entre \$923 y \$946.
+                </p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="mt-10 pt-4 border-t border-gray-300 text-center text-sm text-gray-500">
+            &copy; 2025 Bci Estrategia y Estudios. Resumen extendido para uso interno.
+        </footer>
     </div>
-
-    <script>
-        // ===================================================================
-        // SCRIPT DE DATOS Y LÓGICA DEL SIMULADOR
-        // ===================================================================
-
-        // --- 1. DEFINICIÓN DE DATOS ---
-
-        // INPUT 1: Cartera Actual del Cliente (Cliente desde Cero)
-        const carteraActual = [];
-
-        // INPUT 2: Datos de Portafolios Accionarios Bci (usados para Sec 3 y Sec 1.5)
-        const portafoliosBCI = {
-            "tactico": {
-                id: "tactico",
-                nombre: "Portafolio Táctico",
-                perfil: "Agresivo",
-                ytd: 51.9,
-                descripcion: "Diseñado para capturar valor de forma activa frente a oportunidades de corto y mediano plazo, con gestión flexible.",
-                composicion: [
-                    { activo: "BSANTANDER", peso: 0.20, sector: "Bancario", categoria: "Bancos" },
-                    { activo: "LTM", peso: 0.20, sector: "Transporte", categoria: "Transportes" },
-                    { activo: "ANDINA-B", peso: 0.10, sector: "Bebidas", categoria: "Bebidas" },
-                    { activo: "AGUAS-A", peso: 0.10, sector: "Sanitario", categoria: "Sanitarias" },
-                    { activo: "CHILE", peso: 0.10, sector: "Bancario", categoria: "Bancos" },
-                    { activo: "SQM-B", peso: 0.10, sector: "Commodities", categoria: "Commodities" },
-                    { activo: "CENCOSUD", peso: 0.075, sector: "Retail", categoria: "Retail" },
-                    { activo: "FALABELLA", peso: 0.075, sector: "Retail", categoria: "Retail" },
-                    { activo: "MALLPLAZA", peso: 0.05, sector: "Inmobiliario", categoria: "Inm. Comercial" }
-                ]
-            },
-            "fundamental": {
-                id: "fundamental",
-                nombre: "Portafolio Fundamental",
-                perfil: "Agresivo",
-                ytd: 44.5,
-                descripcion: "Diseñado para maximizar rentabilidad a través de ganancias de capital con visión de mediano a largo plazo, basado en fundamentos sólidos.",
-                composicion: [
-                    { activo: "BSANTANDER", peso: 0.20, sector: "Bancario", categoria: "Bancos" },
-                    { activo: "LTM", peso: 0.20, sector: "Transporte", categoria: "Transportes" },
-                    { activo: "CENCOMALLS", peso: 0.175, sector: "Inmobiliario", categoria: "Inm. Comercial" },
-                    { activo: "ENELCHILE", peso: 0.15, sector: "Eléctrico", categoria: "Eléctricas" },
-                    { activo: "SQM-B", peso: 0.125, sector: "Commodities", categoria: "Commodities" },
-                    { activo: "CENCOSUD", peso: 0.10, sector: "Retail", categoria: "Retail" },
-                    { activo: "FALABELLA", peso: 0.05, sector: "Retail", categoria: "Retail" }
-                ]
-            },
-            "dividendos": {
-                id: "dividendos",
-                nombre: "Portafolio Dividendos",
-                perfil: "Moderado",
-                ytd: 41.3,
-                descripcion: "Objetivo principal es obtener retornos vía reparto de dividendos, con un beta relativamente bajo.",
-                composicion: [
-                    { activo: "BSANTANDER", peso: 0.25, sector: "Bancario", categoria: "Bancos" },
-                    { activo: "CENCOMALLS", peso: 0.15, sector: "Inmobiliario", categoria: "Inm. Comercial" },
-                    { activo: "AGUAS-A", peso: 0.15, sector: "Sanitario", categoria: "Sanitarias" },
-                    { activo: "ENELCHILE", peso: 0.10, sector: "Eléctrico", categoria: "Eléctricas" },
-                    { activo: "COLBUN", peso: 0.10, sector: "Eléctrico", categoria: "Eléctricas" },
-                    { activo: "CHILE", peso: 0.10, sector: "Bancario", categoria: "Bancos" },
-                    { activo: "ANDINA-B", peso: 0.10, sector: "Bebidas", categoria: "Bebidas" },
-                    { activo: "VAPORES", peso: 0.05, sector: "Transporte", categoria: "Transportes" }
-                ]
-            },
-            "esg": {
-                id: "esg",
-                nombre: "Portafolio ESG",
-                perfil: "Agresivo",
-                ytd: 44.7,
-                descripcion: "Busca alinear objetivos de rentabilidad con una visión de sostenibilidad, invirtiendo en compañías con compromiso comprobable ASG.",
-                composicion: [
-                    { activo: "BSANTANDER", peso: 0.25, sector: "Bancario", categoria: "Bancos" },
-                    { activo: "PARAUCO", peso: 0.25, sector: "Inmobiliario", categoria: "Inm. Comercial" },
-                    { activo: "LTM", peso: 0.20, sector: "Transporte", categoria: "Transportes" },
-                    { activo: "ENELCHILE", peso: 0.10, sector: "Eléctrico", categoria: "Eléctricas" },
-                    { activo: "CENCOSUD", peso: 0.10, sector: "Retail", categoria: "Retail" },
-                    { activo: "SMU", peso: 0.05, sector: "Retail", categoria: "Retail" },
-                    { activo: "CMPC", peso: 0.05, sector: "Forestal", categoria: "Forestal" }
-                ]
-            },
-            "eeuu": {
-                id: "eeuu",
-                nombre: "Portafolio Acciones EE.UU. (CLP)",
-                perfil: "Agresivo",
-                ytd: 16.7,
-                descripcion: "Exposición directa al mercado estadounidense (acciones listadas en bolsa local) para superar al S&P 500.",
-                composicion: [
-                    { activo: "VISA (VCL)", peso: 0.20, sector: "Tecnología", categoria: "Tecnología" },
-                    { activo: "ELI LILLY (LLYCL)", peso: 0.15, sector: "Salud", categoria: "Salud" },
-                    { activo: "AMAZON (AMZNCL)", peso: 0.15, sector: "Consumo Discrecional", categoria: "Consumo" },
-                    { activo: "MICROSOFT (MSFTCL)", peso: 0.10, sector: "Tecnología", categoria: "Tecnología" },
-                    { activo: "META (METACL)", peso: 0.10, sector: "Comunicaciones", categoria: "Comunicaciones" },
-                    { activo: "NEWMONT (NEMCL)", peso: 0.10, sector: "Materiales", categoria: "Commodities" },
-                    { activo: "ORACLE (ORCLCL)", peso: 0.10, sector: "Tecnología", categoria: "Tecnología" },
-                    { activo: "NVIDIA (NVDACL)", peso: 0.05, sector: "Tecnología", categoria: "Tecnología" }
-                ]
-            }
-        };
-
-        // INPUT 3: "Database" de Análisis Fundamental (Sección 2 Dinámica)
-        const analisisActivosClave = {
-            'BSANTANDER': {
-                nombre: 'Banco Santander (BSANTANDER)',
-                recomendacion: 'Neutral',
-                precioObjetivo: '$ 68 / acción',
-                retorno: '13,2%',
-                fuente: 'Booklet 2026',
-                tesis: 'Proyectamos que el Margen de Interés Neto (NIM) será el principal motor de los resultados financieros. Esta expansión se fundamenta en una continua moderación del costo de fondeo en un escenario de tasas más favorable. Esperamos que el margen bruto crezca, catalizando una robusta expansión de la utilidad neta. Si bien la cartera morosa alcanzó un 3,2% en 2024, estimamos una progresiva mejora. Es clave destacar que el banco cuenta con sólidos niveles de cobertura que le permiten absorber este riesgo, derivando en un costo por riesgo controlado que proyectamos mejorará desde 2026. Adicionalmente, avances tecnológicos como el nuevo sistema "Gravity" posicionan al banco como líder en eficiencia operacional. La sólida generación de capital sustenta una atractiva política de dividendos (payout 60-70%).',
-                driversPositivos: [
-                    'Expansión de márgenes (NIM) por escenario de tasas más favorable.',
-                    'Avances tecnológicos ("Gravity") que mejoran la eficiencia operacional.',
-                    'Sólida generación de capital y atractiva política de dividendos.'
-                ],
-                driversNegativos: [
-                    'Evolución del costo de crédito asociado al escenario económico y político.',
-                    'Riesgo regulatorio que podría afectar el cálculo de requerimientos de capital.',
-                    'Riesgos de mercado que desvíen los supuestos de valoración.'
-                ]
-            },
-            'LTM': {
-                nombre: 'LATAM Airlines (LTM)',
-                recomendacion: 'Sobreponderar',
-                precioObjetivo: '$ 28 / acción',
-                retorno: '39,4%',
-                fuente: 'Booklet 2026',
-                tesis: 'Mantenemos una visión positiva de la compañía, principalmente por las perspectivas de crecimiento en oferta (ASK) para los próximos años, el plan de flota y los costos por asiento-kilómetro excluyendo combustible (CASK-ex fuel), que de mantenerse en niveles actuales continuarán agregando valor. La demanda se mantiene sana. La aerolínea ha mostrado un favorable aumento en ASK (+8,22% acumulado a ago-2025), en línea con la región. El segmento que ha empujado el crecimiento ha sido consistentemente Internacional (+10,55%). Proyectamos un precio de jet-fuel de USD 90/barril a largo plazo, y asumimos una leve mejora en consumo por la entrada de aeronaves más eficientes. Además, se mantienen beneficios tributarios que continuarían favoreciendo la última línea.',
-                driversPositivos: [
-                    'Fuerte crecimiento en oferta (ASK), especialmente en el segmento internacional.',
-                    'Demanda resiliente y CASK-ex fuel controlados.',
-                    'Renovación de flota con aeronaves más eficientes.',
-                    'Beneficios tributarios que favorecen la utilidad neta.'
-                ],
-                driversNegativos: [
-                    'Imposición de aranceles por parte de EEUU a países latinoamericanos.',
-                    'Depreciación de monedas locales donde opera la compañía.',
-                    'Volatilidad en el precio del petróleo y jet fuel.',
-                    'Presiones en precio producto de futuras ventas secundarias de acciones.'
-                ]
-            },
-            'SQM-B': {
-                nombre: 'SQM (SQM-B)',
-                recomendacion: 'Sobreponderar',
-                precioObjetivo: '$ 51.000 / acción',
-                retorno: '23,4%',
-                fuente: 'Booklet 2026',
-                tesis: 'El mercado del litio continúa transitando por un exceso de oferta internacional, aunque las perspectivas de equilibrio han evolucionado favorablemente, mejorando la trayectoria de precios de corto plazo. La mejora en los precios se explica por cambios recientes en la producción y sus perspectivas. Conservadoramente, proyectamos precios realizados de litio promediando ~US$10,9/kg en 2026. Los volúmenes despachados de litio se ubicarían en 230k ton en 2025, aumentando a 278k ton en 2026. Nuestro modelo considera un precio de largo plazo de US$13/kg. Prevemos una generación de flujos moderada en 2025, pero con evolución favorable desde el segundo semestre.',
-                driversPositivos: [
-                    'Mejora en las perspectivas de precio del litio.',
-                    'Fuerte aumento en volúmenes de venta proyectados para 2026 (+21% a/a).',
-                    'Certificación IRMA 75, primera en el mundo en litio, generando ventaja competitiva.'
-                ],
-                driversNegativos: [
-                    'Aceleración de la caída de precios internacionales del Litio.',
-                    'Modificaciones en el plan de inversiones de la compañía.',
-                    'Avances tecnológicos que impliquen menor uso de litio o riesgo de sustitución.'
-                ]
-            },
-            'CENCOSUD': {
-                nombre: 'Cencosud (CENCOSUD)',
-                recomendacion: 'Sobreponderar',
-                precioObjetivo: '$ 3.300 / acción',
-                retorno: '21,3%',
-                fuente: 'Booklet 2026',
-                tesis: 'Estimamos que los próximos años serán de rentabilizar y expandir operaciones en países claves como Chile, Estados Unidos y Brasil. Creemos que la acción se encuentra descontada en relación a sus múltiplos históricos, considerando la mejora en márgenes y expansión. El segmento de supermercados (65% del Ebitda) permite una generación de flujos más estables. Incorporamos un plan de inversiones de aprox. US$500 millones para 2026, destinados a crecimiento, remodelaciones y tecnología, fortaleciendo su posición competitiva. Mantenemos una visión conservadora para Argentina.',
-                driversPositivos: [
-                    'Foco en rentabilizar y expandir operaciones en mercados clave (EEUU, Brasil).',
-                    'Segmento Supermercados (65% Ebitda) aporta flujos estables y resilientes.',
-                    'Plan de inversiones para remodelación y tecnología.',
-                    'Plan de desapalancamiento y estrategia de rentabilizar operación.'
-                ],
-                driversNegativos: [
-                    'Debilidad del consumo discrecional superior a la estimada.',
-                    'Desviaciones en el plan de inversiones o su rentabilidad.',
-                    'Depreciación de monedas locales (Argentina, Perú, etc.).',
-                    'Aparición de nuevos competidores internacionales con foco en e-commerce.'
-                ]
-            },
-            'CENCOMALLS': {
-                nombre: 'Cenco Malls (CENCOMALLS)',
-                recomendacion: 'Sobreponderar',
-                precioObjetivo: '$ 2.450 / acción',
-                retorno: '24,6%',
-                fuente: 'Booklet 2026',
-                tesis: 'La compañía posee un alto porcentaje de contratos con alto componente fijo, indexados a inflación y contratos de largo plazo con locatarios, que generarían estabilidad en flujos. Durante el 1S25 las visitas aumentaron un 1,9% a/a y el nivel de ocupación llegó a 98,5%. Los crecimientos de GLA vendrán por remodelaciones y ampliaciones, destacando Cenco La Molina en Perú. Se busca potenciar el uso mixto, que hoy representa un 16,8% del GLA.',
-                driversPositivos: [
-                    'Contratos fijos de largo plazo indexados a inflación (UF).',
-                    'Altos y crecientes niveles de ocupación (98,5%).',
-                    'Desarrollo de nuevos proyectos (Perú) y expansión de uso mixto.'
-                ],
-                driversNegativos: [
-                    'Evolución de la economía (consumo) diferente a lo esperado.',
-                    'Alta exposición a ingresos provenientes de parte relacionada (Cencosud S.A.).',
-                    'Nuevas reformas tributarias en los países donde opera.'
-                ]
-            },
-            'AGUAS-A': {
-                nombre: 'Aguas Andinas (AGUAS-A)',
-                recomendacion: 'Neutral',
-                precioObjetivo: '$ 400 / acción',
-                retorno: '17,4%',
-                fuente: 'Booklet 2026',
-                tesis: 'La compañía se encuentra en fase de ejecución de obras (plan Biociudad), lo que junto a las tarifas aprobadas para este quinquenio impulsarían un margen EBITDA a niveles de 55% hacia 2030. El costo de la deuda ha disminuido, ubicando el WACC en 7,4%. Las tarifas ajustadas para enfrentar el estrés hídrico otorgan certidumbre en la rentabilidad futura, lo que se traduce en una recuperación sostenida de márgenes.',
-                driversPositivos: [
-                    'Nuevas tarifas (octavo proceso) otorgan certidumbre y mejoran márgenes.',
-                    'Plan de inversiones (Biociudad) para mitigar riesgo hídrico.',
-                    'Disminución en el costo de deuda (WACC 7.4%).'
-                ],
-                driversNegativos: [
-                    'Fenómenos climatológicos (turbiedad, sequía) que afecten la operación.',
-                    'Presiones inflacionarias y tasas de interés elevadas.',
-                    'Permisología más exigente por parte del regulador.'
-                ]
-            }
-        };
-        
-        // INPUT 4: Definición de las Estrategias (para Sección 1.5)
-        const modelosEstrategia = {
-            'tactico': {
-                nombre: "Agresivo (Táctico)",
-                modelo: portafoliosBCI.tactico.composicion,
-                activosClave: ['LTM', 'SQM-B', 'CENCOSUD'] // Key stocks for this model
-            },
-            'fundamental': {
-                nombre: "Agresivo (Fundamental)",
-                modelo: portafoliosBCI.fundamental.composicion,
-                activosClave: ['BSANTANDER', 'LTM', 'CENCOMALLS']
-            },
-            'dividendos': {
-                nombre: "Moderado (Dividendos)",
-                modelo: portafoliosBCI.dividendos.composicion,
-                activosClave: ['BSANTANDER', 'CENCOMALLS', 'AGUAS-A']
-            }
-        };
-
-        // --- 2. VARIABLES GLOBALES Y UTILIDADES ---
-
-        let modeloRecomendado = []; // Se setea en setEstrategia()
-        let chartActual = null;
-        let chartObjetivo = null;
-
-        // Registrar el plugin de datalabels globalmente
-        Chart.register(ChartDataLabels);
-        Chart.defaults.font.family = 'Arial';
-        Chart.defaults.plugins.datalabels.color = '#fff';
-        Chart.defaults.plugins.datalabels.font = { weight: 'bold', size: 12 };
-        Chart.defaults.plugins.datalabels.formatter = (value, ctx) => {
-            let sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-            let percentage = (value * 100 / sum).toFixed(1) + '%';
-            return (value / sum) > 0.03 ? percentage : ''; // Solo mostrar si es > 3%
-        };
-
-        function formatCLP(value) {
-            if (isNaN(value)) value = 0;
-            return '$' + Math.round(value).toLocaleString('es-CL');
-        }
-
-        function formatPct(value) {
-            if (isNaN(value) || value === Infinity) value = 0;
-            return (value * 100).toLocaleString('es-CL', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
-        }
-
-        // --- 3. LÓGICA DE INICIALIZACIÓN ---
-
-        document.addEventListener('DOMContentLoaded', () => {
-            initSimulador();
-            initStrategySelector();
-            initListeners();
-            setEstrategia('tactico'); // Set default strategy on load
-        });
-
-        /**
-         * Puebla las tablas iniciales del simulador (Sec 1 y 3).
-         */
-        function initSimulador() {
-            // Puebla Sección 1: Cartera Actual
-            const tablaDesinversionBody = document.querySelector('#tabla-desinversion tbody');
-            tablaDesinversionBody.innerHTML = '';
-            if (carteraActual.length === 0) {
-                 tablaDesinversionBody.innerHTML = '<tr><td colspan="5" style="text-align: center; font-style: italic;">No hay activos en la cartera actual. Ingrese un "Aporte de Capital Nuevo" para comenzar.</td></tr>';
-            } else {
-                carteraActual.forEach((item, index) => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${item.sector}</td>
-                        <td>${item.activo}</td>
-                        <td class="text-right">${formatCLP(item.monto)}</td>
-                        <td class="text-center">
-                            <label class="decision-label"><input type="radio" name="decision-${index}" class="decision-radio" value="rechazar" data-index="${index}" checked> Rechazar</label>
-                            <label class="decision-label"><input type="radio" name="decision-${index}" class="decision-radio" value="aceptar" data-index="${index}"> Aceptar Total</label>
-                            <label class="decision-label"><input type="radio" name="decision-${index}" class="decision-radio" value="parcial" data-index="${index}"> Parcial</label>
-                            <input type="number" class="monto-parcial-input" id="monto-parcial-${index}" data-index="${index}" value="0" style="display: none;">
-                        </td>
-                        <td class="text-right" id="monto-liberar-${index}">$0</td>
-                    `;
-                    tablaDesinversionBody.appendChild(row);
-                });
-            }
-
-            // Puebla Sección 3: Portafolios BCI
-            const tablaPortafoliosBody = document.querySelector('#tabla-portafolios tbody');
-            tablaPortafoliosBody.innerHTML = '';
-            Object.values(portafoliosBCI).forEach(portfolio => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="text-center"><input type="checkbox" class="adp-checkbox" data-id="${portfolio.id}"></td>
-                    <td>${portfolio.nombre}</td>
-                    <td>${portfolio.perfil}</td>
-                    <td class="text-right">${portfolio.ytd.toLocaleString('es-CL')}%</td>
-                    <td class="text-right">
-                        <input type="number" class="adp-monto" id="monto-adp-${portfolio.id}" data-id="${portfolio.id}" value="0" min="0" step="1000000" disabled>
-                    </td>
-                `;
-                tablaPortafoliosBody.appendChild(row);
-            });
-        }
-        
-        /**
-         * Crea los botones de la Sección 1.5.
-         */
-        function initStrategySelector() {
-            const container = document.getElementById('strategy-selector');
-            container.innerHTML = '';
-            Object.keys(modelosEstrategia).forEach(id => {
-                const button = document.createElement('button');
-                button.className = 'strategy-button';
-                button.id = `btn-strategy-${id}`;
-                button.dataset.id = id;
-                button.textContent = modelosEstrategia[id].nombre;
-                button.addEventListener('click', (e) => setEstrategia(e.target.dataset.id));
-                container.appendChild(button);
-            });
-        }
-
-        /**
-         * Añade todos los event listeners para la interactividad.
-         */
-        function initListeners() {
-            // Sección 1: Decisiones de Venta (si existen)
-            document.querySelectorAll('.decision-radio').forEach(radio => {
-                radio.addEventListener('change', (e) => {
-                    const index = e.target.dataset.index;
-                    const montoParcialInput = document.getElementById(`monto-parcial-${index}`);
-                    montoParcialInput.style.display = (e.target.value === 'parcial') ? 'inline-block' : 'none';
-                    updatePropuesta();
-                });
-            });
-            document.querySelectorAll('.monto-parcial-input').forEach(input => {
-                input.addEventListener('input', updatePropuesta);
-            });
-
-            // Sección 1: Aporte de Capital Nuevo
-            document.getElementById('aporte-capital-nuevo').addEventListener('input', updatePropuesta);
-
-            // Sección 3: Checkboxes y Montos de Portafolios
-            document.querySelectorAll('.adp-checkbox').forEach(chk => {
-                chk.addEventListener('change', (e) => {
-                    const id = e.target.dataset.id;
-                    const montoInput = document.getElementById(`monto-adp-${id}`);
-                    montoInput.disabled = !e.target.checked;
-                    if (!e.target.checked) {
-                        montoInput.value = 0;
-                    }
-                    updatePortfolioDisplay();
-                    updatePropuesta();
-                });
-            });
-            document.querySelectorAll('.adp-monto').forEach(input => {
-                input.addEventListener('input', updatePropuesta);
-            });
-            
-            // Sección 3: Toggle Invertir en Modelo
-            document.getElementById('toggle-modelo-acciones').addEventListener('change', (e) => {
-                const container = document.getElementById('ponderacion-acciones-container');
-                container.style.display = e.target.checked ? 'block' : 'none';
-                updatePropuesta();
-            });
-
-            // Sección 5: Botón Imprimir
-            document.getElementById('print-button').addEventListener('click', () => {
-                window.print();
-            });
-        }
-
-        // --- 4. LÓGICA CENTRAL DE CÁLCULO Y RENDER ---
-
-        /**
-         * Define la estrategia de acciones a utilizar.
-         * @param {string} id - El ID de la estrategia (ej: 'tactico').
-         */
-        function setEstrategia(id) {
-            // 1. Actualizar estilo de botones
-            document.querySelectorAll('.strategy-button').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.id === id);
-            });
-            
-            // 2. Setear el modelo recomendado global
-            modeloRecomendado = modelosEstrategia[id].modelo;
-            
-            // 3. Renderizar dinámicamente la Sección 2
-            renderAnalisisClave(modelosEstrategia[id].activosClave);
-            
-            // 4. Renderizar dinámicamente la tabla de ponderación (Sec 3)
-            renderPonderacionAcciones(modeloRecomendado);
-            
-            // 5. Recalcular toda la propuesta
-            updatePropuesta();
-        }
-        
-        /**
-         * Puebla dinámicamente la Sección 2 con el análisis fundamental.
-         * @param {string[]} activosClave - Array de IDs de activos (ej: ['LTM', 'SQM-B']).
-         */
-        function renderAnalisisClave(activosClave) {
-            const container = document.getElementById('analisis-dinamico-container');
-            container.innerHTML = '';
-            
-            activosClave.forEach(id => {
-                const data = analisisActivosClave[id];
-                if (!data) {
-                    console.warn(`No se encontró análisis para ${id}`);
-                    return;
-                }
-                
-                const html = `
-                <div class="analysis-container">
-                    <h3>${data.nombre}</h3>
-                    <table class="analysis-table">
-                        <thead>
-                            <tr>
-                                <th>Recomendación</th>
-                                <th>Precio Objetivo 2026E</th>
-                                <th>Retorno Total Esperado</th>
-                                <th>Fuente</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>${data.recomendacion}</td>
-                                <td>${data.precioObjetivo}</td>
-                                <td>${data.retorno}</td>
-                                <td>${data.fuente}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="analysis-box">
-                        <div class="analysis-justificacion">
-                            <strong>Tesis de Inversión:</strong> ${data.tesis}
-                            <br><cite>Fuente: Booklet Recomendaciones Bursátiles 2026.</cite>
-                        </div>
-                        <div class="analysis-drivers">
-                            <div class="drivers-box drivers-positivo">
-                                <h5>Drivers Positivos</h5>
-                                <ul>${data.driversPositivos.map(d => `<li>${d}</li>`).join('')}</ul>
-                            </div>
-                            <div class="drivers-box drivers-negativo">
-                                <h5>Drivers Negativos / Riesgos</h5>
-                                <ul>${data.driversNegativos.map(d => `<li>${d}</li>`).join('')}</ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-                container.innerHTML += html;
-            });
-        }
-        
-        /**
-         * Puebla la tabla de ponderación en Sección 3 y añade listeners.
-         * @param {object[]} modelo - El array de composición del modelo.
-         */
-        function renderPonderacionAcciones(modelo) {
-            const tbody = document.querySelector('#tabla-ponderacion-acciones tbody');
-            tbody.innerHTML = '';
-            
-            modelo.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.activo}</td>
-                    <td>${item.categoria || item.sector}</td>
-                    <td class="text-right">
-                        <input type="number" class="peso-input" data-activo="${item.activo}" value="${item.peso * 100}" step="0.1" min="0"> %
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-            
-            // Añadir listeners a los nuevos inputs
-            document.querySelectorAll('.peso-input').forEach(input => {
-                input.addEventListener('input', () => {
-                    updatePonderacionTotal();
-                    updatePropuesta();
-                });
-            });
-            
-            updatePonderacionTotal();
-        }
-        
-        /**
-         * Calcula y muestra el total de los pesos en la tabla de ponderación.
-         */
-        function updatePonderacionTotal() {
-            let total = 0;
-            document.querySelectorAll('.peso-input').forEach(input => {
-                total += parseFloat(input.value) || 0;
-            });
-            
-            const totalEl = document.getElementById('total-ponderacion-pct');
-            totalEl.textContent = total.toLocaleString('es-CL', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
-            
-            if (Math.abs(total - 100) > 0.01) {
-                totalEl.classList.add('invalid');
-            } else {
-                totalEl.classList.remove('invalid');
-            }
-        }
-
-
-        /**
-         * Función principal que recalcula toda la propuesta.
-         */
-        function updatePropuesta() {
-            // --- 4.1 CÁLCULOS (Secciones 1 y 3) ---
-
-            let totalCapitalDisponible = 0;
-            let totalVentas = 0;
-            let origenFondos = [];
-
-            // 1. Calcular Aporte de Capital Nuevo
-            let aporteNuevo = parseFloat(document.getElementById('aporte-capital-nuevo').value) || 0;
-            if (aporteNuevo > 0) {
-                origenFondos.push({ 
-                    fuente: "Aporte de Capital Nuevo", 
-                    monto: aporteNuevo, 
-                    cssClass: "new-buy" 
-                });
-            }
-            totalCapitalDisponible += aporteNuevo;
-
-            // 2. Calcular Ventas de Cartera Actual (Sec 1)
-            let ventasAcciones = [];
-            let mantenerAcciones = [];
-            carteraActual.forEach((item, index) => {
-                const decision = document.querySelector(`input[name="decision-${index}"]:checked`).value;
-                const montoLiberarEl = document.getElementById(`monto-liberar-${index}`);
-                let montoALiberar = 0;
-                let montoAMantener = 0;
-
-                if (decision === 'aceptar') {
-                    montoALiberar = item.monto;
-                    montoAMantener = 0;
-                } else if (decision === 'parcial') {
-                    let montoParcial = parseFloat(document.getElementById(`monto-parcial-${index}`).value) || 0;
-                    if (montoParcial > item.monto) montoParcial = item.monto;
-                    montoALiberar = montoParcial;
-                    montoAMantener = item.monto - montoALiberar;
-                } else { // 'rechazar'
-                    montoALiberar = 0;
-                    montoAMantener = item.monto;
-                }
-
-                montoLiberarEl.textContent = formatCLP(montoALiberar);
-                totalVentas += montoALiberar;
-
-                if (montoALiberar > 0) {
-                    ventasAcciones.push({ ...item, ajuste: -montoALiberar, montoObjetivo: montoAMantener });
-                    origenFondos.push({ 
-                        fuente: `Venta ${item.activo}`, 
-                        monto: montoALiberar, 
-                        cssClass: "sell" 
-                    });
-                }
-                if (montoAMantener > 0) {
-                    mantenerAcciones.push({ ...item, ajuste: 0, montoObjetivo: montoAMantener });
-                }
-            });
-            
-            totalCapitalDisponible += totalVentas;
-            document.getElementById('capital-liberado-monto').textContent = formatCLP(totalCapitalDisponible);
-
-            // 3. Calcular Inversión en Portafolios (Sec 3)
-            let totalMontoPortafolios = 0;
-            let destinoPortafolios = [];
-            let objetivoPortafolios = []; // Para Sec 4 y 5
-            
-            document.querySelectorAll('.adp-monto').forEach(input => {
-                if (!input.disabled) {
-                    totalMontoPortafolios += parseFloat(input.value) || 0;
-                }
-            });
-
-            // 4. Validar Capital y Calcular Capital para Acciones
-            const capitalWarningEl = document.getElementById('capital-warning');
-            if (totalMontoPortafolios > totalCapitalDisponible) {
-                totalMontoPortafolios = totalCapitalDisponible;
-                capitalWarningEl.style.display = 'block';
-                // Opcional: re-ajustar los inputs proporcionalmente (omitido por simplicidad)
-            } else {
-                capitalWarningEl.style.display = 'none';
-            }
-
-            let capitalParaAcciones = totalCapitalDisponible - totalMontoPortafolios;
-            document.getElementById('capital-para-acciones-monto').textContent = formatCLP(capitalParaAcciones);
-
-            // 5. Preparar datos de destino
-            document.querySelectorAll('.adp-checkbox:checked').forEach(chk => {
-                const id = chk.dataset.id;
-                const portfolio = portafoliosBCI[id];
-                let montoPortfolio = parseFloat(document.getElementById(`monto-adp-${id}`).value) || 0;
-                
-                // Re-distribuir si el total excedió
-                if (totalMontoPortafolios < (parseFloat(document.getElementById(`monto-adp-${id}`).value) || 0)) {
-                    montoPortfolio = (montoPortfolio / totalMontoPortafolios) * totalCapitalDisponible; 
-                }
-
-                if (montoPortfolio > 0) {
-                    const data = {
-                        ...portfolio,
-                        categoria: "Portafolios BCI",
-                        activo: portfolio.nombre,
-                        montoActual: 0,
-                        ajuste: montoPortfolio,
-                        montoObjetivo: montoPortfolio
-                    };
-                    destinoPortafolios.push({ 
-                        fuente: portfolio.nombre, 
-                        monto: montoPortfolio, 
-                        cssClass: "buy" 
-                    });
-                    objetivoPortafolios.push(data);
-                }
-            });
-            
-            let destinoAccionesMonto = 0;
-            let objetivoAcciones = []; // Para Sec 4 y 5
-            const invertirEnModelo = document.getElementById('toggle-modelo-acciones').checked;
-            
-            if (capitalParaAcciones > 0 && invertirEnModelo) {
-                destinoAccionesMonto = capitalParaAcciones;
-                destinoPortafolios.push({ 
-                    fuente: "Modelo Acciones Individuales", 
-                    monto: capitalParaAcciones, 
-                    cssClass: "buy" 
-                });
-
-                // Distribuir `capitalParaAcciones` según los inputs de la tabla de ponderación
-                let pesosCustom = [];
-                let totalPesosCustom = 0;
-                document.querySelectorAll('.peso-input').forEach(input => {
-                    const peso = parseFloat(input.value) || 0;
-                    pesosCustom.push({
-                        activo: input.dataset.activo,
-                        peso: peso
-                    });
-                    totalPesosCustom += peso;
-                });
-                
-                if (totalPesosCustom === 0) totalPesosCustom = 100; // Evitar división por cero
-
-                pesosCustom.forEach(item => {
-                    const montoCompra = capitalParaAcciones * (item.peso / totalPesosCustom);
-                    // Encontrar la data completa de la acción
-                    const dataOriginal = modeloRecomendado.find(m => m.activo === item.activo);
-                    objetivoAcciones.push({
-                        ...dataOriginal,
-                        montoActual: 0,
-                        ajuste: montoCompra,
-                        montoObjetivo: montoCompra
-                    });
-                });
-
-            } else if (capitalParaAcciones > 0 && !invertirEnModelo) {
-                // El capital restante va a Caja
-                const caja = { 
-                    id: "caja", 
-                    categoria: "Liquidez", 
-                    activo: "Caja (No Asignado)", 
-                    montoActual: 0, 
-                    ajuste: capitalParaAcciones, 
-                    montoObjetivo: capitalParaAcciones, 
-                    composicion: [] 
-                };
-                objetivoPortafolios.push(caja);
-                destinoPortafolios.push({ 
-                    fuente: "Caja (No Asignado)", 
-                    monto: capitalParaAcciones, 
-                    cssClass: "new-buy" 
-                });
-            }
-
-            // --- 4.2 GENERACIÓN DE DATOS FINALES ---
-
-            // Consolidar datos de Acciones (Mantener + Comprar)
-            const accionesFinalMap = new Map();
-            
-            // 1. Agregar acciones a mantener
-            mantenerAcciones.forEach(item => {
-                accionesFinalMap.set(item.activo, {
-                    ...item,
-                    montoActual: item.monto,
-                    ajuste: item.montoObjetivo - item.monto, // Será 0 o negativo (venta parcial)
-                    montoObjetivo: item.montoObjetivo
-                });
-            });
-
-            // 2. Agregar acciones vendidas (parcialmente)
-            ventasAcciones.forEach(item => {
-                if (item.montoObjetivo > 0) { // Venta parcial
-                    if (accionesFinalMap.has(item.activo)) {
-                        let existing = accionesFinalMap.get(item.activo);
-                        existing.ajuste = item.montoObjetivo - item.monto;
-                        existing.montoObjetivo = item.montoObjetivo;
-                    } else {
-                        accionesFinalMap.set(item.activo, {
-                            ...item,
-                            montoActual: item.monto,
-                            ajuste: item.montoObjetivo - item.monto,
-                            montoObjetivo: item.montoObjetivo
-                        });
-                    }
-                }
-            });
-
-            // 3. Agregar acciones compradas
-            objetivoAcciones.forEach(item => {
-                const montoCompra = item.montoObjetivo;
-                if (accionesFinalMap.has(item.activo)) {
-                    // Acción ya existe (se mantuvo o vendió parcialmente Y se compró más)
-                    let existing = accionesFinalMap.get(item.activo);
-                    existing.ajuste += montoCompra;
-                    existing.montoObjetivo += montoCompra;
-                } else {
-                    // Acción nueva
-                    accionesFinalMap.set(item.activo, {
-                        ...item,
-                        montoActual: 0,
-                        ajuste: montoCompra,
-                        montoObjetivo: montoCompra
-                    });
-                }
-            });
-
-            // 4. Agregar acciones vendidas totalmente (para que aparezcan con monto 0)
-            ventasAcciones.forEach(item => {
-                if (item.montoObjetivo === 0 && !accionesFinalMap.has(item.activo)) {
-                    accionesFinalMap.set(item.activo, {
-                        ...item,
-                        montoActual: item.monto,
-                        ajuste: -item.monto,
-                        montoObjetivo: 0
-                    });
-                }
-            });
-
-            const accionesFinal = Array.from(accionesFinalMap.values());
-            const portafoliosFinal = objetivoPortafolios; // Ya está listo
-
-            // --- 4.3 RENDERIZADO (Secciones 4 y 5) ---
-            renderTablaFinal(accionesFinal, portafoliosFinal);
-            renderResumenEjecutivo(origenFondos, destinoPortafolios, accionesFinal, portafoliosFinal, totalCapitalDisponible);
-            updateCharts(accionesFinal, portafoliosFinal);
-        }
-
-        /**
-         * Actualiza las tablas de la Sección 4.
-         */
-        function renderTablaFinal(accionesFinal, portafoliosFinal) {
-            const tablaAccionesBody = document.querySelector('#tabla-final-acciones tbody');
-            const tablaAdpBody = document.querySelector('#tabla-final-adp tbody');
-            
-            tablaAccionesBody.innerHTML = '';
-            tablaAdpBody.innerHTML = '';
-
-            let totalActual = 0;
-            let totalObjetivo = 0;
-            let accionesRendered = 0;
-
-            // Render Acciones
-            accionesFinal.forEach(item => {
-                totalActual += item.montoActual;
-                totalObjetivo += item.montoObjetivo;
-                const ajusteClass = item.ajuste < 0 ? 'sell' : (item.montoActual > 0 ? 'buy' : 'new-buy');
-                const pctAjuste = (item.montoActual > 0) ? (item.ajuste / item.montoActual) : (item.montoObjetivo > 0 ? Infinity : 0);
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.categoria || 'N/A'}</td>
-                    <td>${item.activo}</td>
-                    <td class="text-right">${formatCLP(item.montoActual)}</td>
-                    <td class="text-right ${ajusteClass}">${formatCLP(item.ajuste)}</td>
-                    <td class="text-right ${ajusteClass}">${isFinite(pctAjuste) ? formatPct(pctAjuste) : 'N/A'}</td>
-                    <td class="text-right">${formatCLP(item.montoObjetivo)}</td>
-                `;
-                if (item.montoObjetivo > 0 || item.montoActual > 0) {
-                    tablaAccionesBody.appendChild(row);
-                    accionesRendered++;
-                }
-            });
-            if (accionesRendered === 0) {
-                tablaAccionesBody.innerHTML = '<tr><td colspan="6" style="text-align: center; font-style: italic;">No hay acciones individuales en la propuesta.</td></tr>';
-            }
-
-            // Render Portafolios y Caja
-            let portafoliosRendered = 0;
-            portafoliosFinal.forEach(item => {
-                totalActual += item.montoActual;
-                totalObjetivo += item.montoObjetivo;
-                const ajusteClass = 'new-buy';
-
-                const row = document.createElement('tr');
-                if (item.id === 'caja') {
-                    row.classList.add('caja-row');
-                } else {
-                    row.classList.add('portfolio-row');
-                }
-                
-                row.innerHTML = `
-                    <td>${item.categoria}</td>
-                    <td>${item.activo}</td>
-                    <td class="text-right">${formatCLP(item.montoActual)}</td>
-                    <td class="text-right ${ajusteClass}">${formatCLP(item.ajuste)}</td>
-                    <td class="text-right ${ajusteClass}">N/A</td>
-                    <td class="text-right">${formatCLP(item.montoObjetivo)}</td>
-                `;
-                tablaAdpBody.appendChild(row);
-                portafoliosRendered++;
-
-                // Detalle de composición del portafolio (si no es "Caja")
-                if (item.composicion && item.composicion.length > 0) {
-                    item.composicion.forEach(comp => {
-                        const montoDetalle = item.montoObjetivo * comp.peso;
-                        const rowDetail = document.createElement('tr');
-                        rowDetail.classList.add('portfolio-detail-row');
-                        rowDetail.innerHTML = `
-                            <td></td>
-                            <td>&nbsp;&nbsp;&nbsp;↳ ${comp.activo}</td>
-                            <td class="text-right">${formatCLP(0)}</td>
-                            <td class="text-right ${ajusteClass}">${formatCLP(montoDetalle)}</td>
-                            <td class="text-right ${ajusteClass}">(${formatPct(comp.peso)})</td>
-                            <td class="text-right">${formatCLP(montoDetalle)}</td>
-                        `;
-                        tablaAdpBody.appendChild(rowDetail);
-                    });
-                }
-            });
-            if (portafoliosRendered === 0) {
-                 tablaAdpBody.innerHTML = '<tr><td colspan="6" style="text-align: center; font-style: italic;">No se seleccionaron portafolios.</td></tr>';
-            }
-        }
-
-        /**
-         * Actualiza toda la Sección 5: Resumen Ejecutivo.
-         */
-        function renderResumenEjecutivo(origenFondos, destinoFondos, accionesFinal, portafoliosFinal, totalCapitalDisponible) {
-            const origenUl = document.getElementById('origen-fondos');
-            const destinoUl = document.getElementById('destino-fondos');
-            const tablaResumenBody = document.querySelector('#ejecutivo-tabla-final tbody');
-            const tablaResumenFoot = document.querySelector('#ejecutivo-tabla-final tfoot');
-
-            origenUl.innerHTML = '';
-            destinoUl.innerHTML = '';
-            tablaResumenBody.innerHTML = '';
-            tablaResumenFoot.innerHTML = '';
-
-            let totalOrigen = 0;
-            origenFondos.forEach(item => {
-                totalOrigen += item.monto;
-                origenUl.innerHTML += `
-                    <li>
-                        <span class="${item.cssClass}">${item.fuente}</span>
-                        <span class="${item.cssClass}">${formatCLP(item.monto)}</span>
-                    </li>`;
-            });
-            origenUl.innerHTML += `<li class="total"><span>Total Origen</span><span>${formatCLP(totalOrigen)}</span></li>`;
-
-            let totalDestino = 0;
-            destinoFondos.forEach(item => {
-                totalDestino += item.monto;
-                destinoUl.innerHTML += `
-                    <li>
-                        <span class="${item.cssClass}">${item.fuente}</span>
-                        <span class="${item.cssClass}">${formatCLP(item.monto)}</span>
-                    </li>`;
-            });
-            destinoUl.innerHTML += `<li class="total"><span>Total Destino</span><span>${formatCLP(totalDestino)}</span></li>`;
-
-            // Tabla Resumen Final
-            let granTotalObjetivo = 0;
-            
-            const todosLosActivos = [...accionesFinal, ...portafoliosFinal];
-            todosLosActivos.forEach(item => {
-                granTotalObjetivo += item.montoObjetivo;
-            });
-
-            todosLosActivos.sort((a, b) => b.montoObjetivo - a.montoObjetivo);
-
-            todosLosActivos.forEach(item => {
-                if (item.montoObjetivo > 0) {
-                    const pctCartera = (granTotalObjetivo > 0) ? (item.montoObjetivo / granTotalObjetivo) : 0;
-                    const row = document.createElement('tr');
-                    if(item.categoria === 'Portafolios BCI') {
-                        row.classList.add('portfolio-row');
-                    } else if (item.id === 'caja') {
-                        row.classList.add('caja-row');
-                    }
-                    row.innerHTML = `
-                        <td>${item.categoria || 'N/A'}</td>
-                        <td>${item.activo}</td>
-                        <td class="text-right">${formatCLP(item.montoObjetivo)}</td>
-                        <td class="text-right">${formatPct(pctCartera)}</td>
-                    `;
-                    tablaResumenBody.appendChild(row);
-                }
-            });
-
-            // Footer
-            tablaResumenFoot.innerHTML = `
-                <tr>
-                    <td colspan="2"><strong>Total Cartera Objetivo</strong></td>
-                    <td class="text-right"><strong>${formatCLP(granTotalObjetivo)}</strong></td>
-                    <td class="text-right"><strong>${formatPct(1)}</strong></td>
-                </tr>
-            `;
-        }
-
-        /**
-         * Actualiza los gráficos (Dona) en la Sección 5.
-         */
-        function updateCharts(accionesFinal, portafoliosFinal) {
-            const ctxActual = document.getElementById('grafico-actual').getContext('2d');
-            const ctxObjetivo = document.getElementById('grafico-objetivo').getContext('2d');
-
-            if (chartActual) chartActual.destroy();
-            if (chartObjetivo) chartObjetivo.destroy();
-
-            // --- Gráfico Cartera Actual ---
-            const dataActual = {
-                labels: carteraActual.length > 0 ? carteraActual.map(a => a.activo) : ['Sin Cartera Actual'],
-                datasets: [{
-                    data: carteraActual.length > 0 ? carteraActual.map(a => a.monto) : [1],
-                    backgroundColor: carteraActual.length > 0 ? ['#002D5A', '#005FFF', '#00A1DF', '#6C757D', '#ADB5BD'] : ['#EEEEEE'],
-                }]
-            };
-            chartActual = new Chart(ctxActual, {
-                type: 'doughnut',
-                data: dataActual,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: carteraActual.length > 0, position: 'bottom' },
-                        tooltip: { 
-                            callbacks: { 
-                                label: (ctx) => carteraActual.length > 0 ? `${ctx.label}: ${formatCLP(ctx.raw)}` : 'N/A'
-                            } 
-                        },
-                        datalabels: {
-                            display: carteraActual.length > 0
-                        }
-                    }
-                }
-            });
-
-            // --- Gráfico Cartera Objetivo ---
-            // Agrupar acciones y portafolios
-            const dataObjetivoMap = new Map();
-            accionesFinal.forEach(item => {
-                if (item.montoObjetivo > 0) {
-                    dataObjetivoMap.set(item.activo, (dataObjetivoMap.get(item.activo) || 0) + item.montoObjetivo);
-                }
-            });
-            portafoliosFinal.forEach(item => {
-                if (item.montoObjetivo > 0) {
-                    dataObjetivoMap.set(item.activo, (dataObjetivoMap.get(item.activo) || 0) + item.montoObjetivo);
-                }
-            });
-            
-            const hasDataObjetivo = dataObjetivoMap.size > 0;
-
-            const dataObjetivo = {
-                labels: hasDataObjetivo ? Array.from(dataObjetivoMap.keys()) : ['Sin Asignación'],
-                datasets: [{
-                    data: hasDataObjetivo ? Array.from(dataObjetivoMap.values()) : [1],
-                    backgroundColor: hasDataObjetivo ? ['#002D5A', '#005FFF', '#00A1DF', '#018749', '#FFC107', '#D00000', '#6C757D', '#ADB5BD', '#28A745', '#17A2B8'] : ['#EEEEEE'],
-                }]
-            };
-
-            chartObjetivo = new Chart(ctxObjetivo, {
-                type: 'doughnut',
-                data: dataObjetivo,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: hasDataObjetivo, position: 'bottom' },
-                        tooltip: { 
-                            callbacks: { 
-                                label: (ctx) => hasDataObjetivo ? `${ctx.label}: ${formatCLP(ctx.raw)}` : 'N/A'
-                            } 
-                        },
-                        datalabels: {
-                            display: hasDataObjetivo
-                        }
-                    }
-                }
-            });
-        }
-        
-        /**
-         * Muestra la descripción del portafolio seleccionado en la Sección 3.
-         */
-        function updatePortfolioDisplay() {
-            const displayEl = document.getElementById('adp-info-display');
-            let html = '';
-            document.querySelectorAll('.adp-checkbox:checked').forEach(chk => {
-                const id = chk.dataset.id;
-                const p = portafoliosBCI[id];
-                html += `
-                    <div>
-                        <strong>${p.nombre}:</strong> (YTD: ${p.ytd}%) ${p.descripcion}
-                        <p><i>Composición: ${p.composicion.map(c => `${c.activo} (${formatPct(c.peso)})`).join(', ')}</i></p>
-                    </div>`;
-            });
-            if (html === '') {
-                html = '<p>Seleccione un portafolio para ver su descripción y composición principal.</p>';
-            }
-            displayEl.innerHTML = html;
-        }
-
-    </script>
 
 </body>
 </html>
